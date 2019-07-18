@@ -26,43 +26,27 @@
 		
 		
 		
-
-/* 		//Make an insert statement for the Sells table:
-		String insert = "INSERT INTO sells(bar, beer)"
+ 		//Make an insert statement for the Sells table:
+		String insert = "INSERT INTO Account(AccountID, Accountcol)"
 				+ "VALUES (?, ?)";
 		//Create a Prepared SQL statement allowing you to introduce the parameters of the query
 		PreparedStatement ps = con.prepareStatement(insert);
 
 		//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
-		ps.setString(1, newBar);
-		ps.setString(2, newBeer);
+		ps.setString(1, username);
+		ps.setString(2, password);
 		//Run the query against the DB
-		ps.executeUpdate(); */
+		ps.executeUpdate(); 
 		
+		out.print("Insert Success!");
+
 		
-
-		String str = String.format("SELECT * FROM Account WHERE (AccountID = '%1$s') AND (Accountcol = '%2$s');", username, password);
-				
-
-		ResultSet result = stmt.executeQuery(str);		
-				
-		if (result.next()) {
-			
-			out.print("Login Succeeded!");
-
-		}else{
-			
-			out.print("Login Failed");
-
-		}
-
 		//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
 		con.close();
 
 		
 	} catch (Exception ex) {
-		out.print(ex);
-		out.print("Error");
+		out.print("Insert Failed!");
 	}
 %>
 </body>
