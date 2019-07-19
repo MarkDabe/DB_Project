@@ -38,14 +38,20 @@
 		//Run the query against the DB
 		ps.executeUpdate(); 
 		
+		
 		out.print("Insert Success!");
-
+		
 		
 		//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
 		con.close();
 
 		
 	} catch (Exception ex) {
+
+/* 	    String redirectURL = "insertfailed.jsp";
+	    response.sendRedirect(redirectURL);
+ */
+
 		out.print("Insert Failed!");
 	}
 %>
