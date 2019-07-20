@@ -49,8 +49,9 @@
 				
 		if (result.next()) {
 			
-			out.print("Login Succeeded!");
-
+			String redirectURL = "account.jsp";
+		    response.sendRedirect(redirectURL);
+			
 		}else{
 			
 			out.print("Login Failed!");
