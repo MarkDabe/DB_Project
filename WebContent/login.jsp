@@ -45,14 +45,22 @@
 				
 
 		ResultSet result = stmt.executeQuery(str);		
-		
+	
 				
 		if (result.next()) {
-			
+			if( !username.toLowerCase().equals("admin") && !password.toLowerCase().equals("admin")){
+			request.setAttribute("name", request.getParameter("username"));
+			request.getRequestDispatcher("account.jsp").forward(request, response);
+			}else if(username.toLowerCase().equals("admin") && password.toLowerCase().equals("admin")){
+				out.print("Welcome Admin");
+			}
+/* 			
 			String redirectURL = "account.jsp";
 		    response.sendRedirect(redirectURL);
-			
-		}else{
+			 */
+		}
+		
+		else{
 			
 			out.print("Login Failed!");
 

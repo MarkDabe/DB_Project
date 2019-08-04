@@ -33,8 +33,8 @@
 		PreparedStatement ps = con.prepareStatement(insert);
 
 		//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
-		ps.setString(1, username);
-		ps.setString(2, password);
+		ps.setString(1, username.toLowerCase());
+		ps.setString(2, password.toLowerCase());
 		//Run the query against the DB
 		ps.executeUpdate(); 
 		
