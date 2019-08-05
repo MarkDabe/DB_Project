@@ -23,23 +23,27 @@
 		//Get parameters from the HTML form at the HelloWorld.jsp
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
+		String is_rep = request.getParameter("is_rep");
 		
 		
 		
  		//Make an insert statement for the Sells table:
-		String insert = "INSERT INTO Account(AccountID, Accountcol)"
-				+ "VALUES (?, ?)";
+		String insert = "INSERT INTO Account(AccountID, Accountcol, type)"
+				+ "VALUES (?, ?, ?)";
 		//Create a Prepared SQL statement allowing you to introduce the parameters of the query
 		PreparedStatement ps = con.prepareStatement(insert);
 
 		//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
 		ps.setString(1, username.toLowerCase());
 		ps.setString(2, password.toLowerCase());
+		ps.setString(3, is_rep.toLowerCase());
+
 		//Run the query against the DB
 		ps.executeUpdate(); 
 		
 		
-		out.print("Insert Success!");
+		out.print("Account Creation Successful!");
+		
 		
 		
 		//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
@@ -51,9 +55,13 @@
 /* 	    String redirectURL = "insertfailed.jsp";
 	    response.sendRedirect(redirectURL);
  */
-
-		out.print("Insert Failed!");
+		out.print(ex);
+		out.print("Username already exists!");
 	}
-%>
+%>	
+	<form method="post" action="index.jsp">
+	<button type="submit">return to login page</button>
+	</form>
+
 </body>
 </html>

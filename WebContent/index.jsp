@@ -45,6 +45,9 @@ Login to yout account
 	<tr>
 	<td>password</td><td><input type="text" name="password"></td>
 	</tr>
+	<tr>
+    <td>representative</td><td><input type="checkbox" name="is_rep" value="rep"></td>
+	</tr>
 	</table>
 	<button type="submit">Login</button>
     <button type="submit" formaction="register.jsp">Register</button>

@@ -48,23 +48,27 @@
 	
 				
 		if (result.next()) {
-			if( !username.toLowerCase().equals("admin") && !password.toLowerCase().equals("admin")){
-			request.setAttribute("name", request.getParameter("username"));
-			request.getRequestDispatcher("account.jsp").forward(request, response);
+			if(!username.toLowerCase().equals("admin") && !password.toLowerCase().equals("admin")){
+				if(!"rep".equals(result.getString("type"))){
+
+					session.setAttribute("name",request.getParameter("username"));
+					response.sendRedirect("account.jsp");	
+				}else{		
+					session.setAttribute("name",request.getParameter("username"));
+					response.sendRedirect("represenatative.jsp");			
+				}
+/* 			request.setAttribute("name", request.getParameter("username"));
+			request.getRequestDispatcher("account.jsp").forward(request, response); */
+			
 			}else if(username.toLowerCase().equals("admin") && password.toLowerCase().equals("admin")){
-				out.print("Welcome Admin");
+				response.sendRedirect("admin.jsp");
 			}
-/* 			
-			String redirectURL = "account.jsp";
-		    response.sendRedirect(redirectURL);
-			 */
 		}
 		
 		else{
 			
 			out.print("Login Failed!");
 
-	
 		}
 
 		//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
