@@ -30,7 +30,7 @@
 	</table>
        <input type="submit" value="add" name ="button" /> 
        <input type="submit" value="edit" name ="button" /> 
-       <input type="submit" value="delete" name ="button" /> 
+       <input type="submit" value="retrieve_waitlist" name ="button" /> 
        <input type="submit" value="logout" name ="button" /> 
 	</form>	
 <br>	
@@ -60,7 +60,7 @@
 			PreparedStatement ps = con.prepareStatement(insert);
 
 			//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
-			ps.setString(1, flight.toLowerCase());
+			ps.setString(1, type.toLowerCase());
 			ps.setString(2, flight.toLowerCase());
 			ps.setString(3, account.toLowerCase());
 			//Run the query against the DB
@@ -79,9 +79,128 @@
 			out.print("Flight/Account Not Found!");
 		}
    }else if("edit".equals(x)){
-	   out.print("future");
-   }else if("delete".equals(x)){
-		response.sendRedirect("my_waitlist.jsp");	
+	   try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+
+			//Get parameters from the HTML form at the HelloWorld.jsp
+			String account = request.getParameter("account");
+			String flight = request.getParameter("flight");
+			String type = request.getParameter("type");
+			
+			
+			
+	 		//Make an insert statement for the Sells table:
+	 			
+	 		String update = String.format("UPDATE CustomInfo SET Flight_num = '%1$s' WHERE AccountID = '%2$s'", flight, account);
+
+			PreparedStatement ps = con.prepareStatement(update);
+
+			//Run the query against the DB
+			ps.executeUpdate(); 
+			
+			
+			out.print("Reservation Edited!");
+			
+			
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+
+			
+		} catch (Exception ex) {
+			
+			out.print(ex);
+			
+			out.print("Flight/Account Not Found!");
+		}
+   }else if("retrieve_waitlist".equals(x)){
+	   try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+
+			//Get parameters from the HTML form at the HelloWorld.jsp
+
+			String flight = request.getParameter("flight");
+			
+			
+			
+/* 	 		//Make an insert statement for the Sells table:
+	 			
+	 		String update = String.format("UPDATE CustomInfo SET Flight_num = '%1$s' WHERE AccountID = '%2$s'", fligh);
+
+			PreparedStatement ps = con.prepareStatement(update);
+
+			//Run the query against the DB
+			ps.executeUpdate(); 
+			 */
+			
+				String str = String.format("SELECT AccountID FROM CustomInfo WHERE ( Flight_num = '%1$s') AND (type = 'w');", flight);
+				
+
+				ResultSet result = stmt.executeQuery(str);		
+				
+				if(result.next()){
+					//Make an HTML table to show the results in:
+					out.print("<table>");
+
+					//make a row
+					out.print("<tr>");
+					//make a column
+					out.print("<td>");
+					
+					out.print("Account");
+					
+					out.print("</td>");
+					//make a column
+					out.print("<td>");
+					//depending on the radio button selection make a column header for Manufacturer if the beers table was selected and Address if the bars table was selected
+
+
+					out.print("</td>");
+					out.print("</tr>");
+
+					//parse out the results
+					while (result.next()) {
+						//make a row
+						out.print("<tr>");
+						//make a column
+						out.print("<td>");
+						//Print out current bar or beer name:
+						out.print(result.getString("AccountID"));
+						out.print("</td>");
+						out.print("</tr>");
+
+					}
+					
+					out.print("</table>");
+					
+					
+				}else{
+					out.print("No Waitlist Found!");
+				}
+			
+			
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+
+			
+		} catch (Exception ex) {
+			
+			out.print(ex);
+			
+			out.print("Flight Not Found!");
+		}
+		
 	}else if("logout".equals(x)){
 		session.setAttribute("name", null);
 		response.sendRedirect("index.jsp");	

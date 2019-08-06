@@ -39,7 +39,7 @@
 		//Run the query against the DB
 		ps.executeUpdate(); */
 		
-		
+
 
 		String str = String.format("SELECT * FROM Account WHERE (AccountID = '%1$s') AND (Accountcol = '%2$s');", username, password);
 				

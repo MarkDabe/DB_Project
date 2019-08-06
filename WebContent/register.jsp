@@ -23,9 +23,22 @@
 		//Get parameters from the HTML form at the HelloWorld.jsp
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		String is_rep = request.getParameter("is_rep");
+		String is_rep = null;
+
 		
+		try{
+		 is_rep = request.getParameter("is_rep");
+		}
+			catch(Exception ex){
+				
+				is_rep = null;
+				
+	
+		}
 		
+		if(is_rep == null){
+			is_rep = "null";
+		}
 		
  		//Make an insert statement for the Sells table:
 		String insert = "INSERT INTO Account(AccountID, Accountcol, type)"
@@ -55,7 +68,6 @@
 /* 	    String redirectURL = "insertfailed.jsp";
 	    response.sendRedirect(redirectURL);
  */
-		out.print(ex);
 		out.print("Username already exists!");
 	}
 %>	
