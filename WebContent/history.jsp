@@ -7,14 +7,118 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>history</title>
+<title>MY Previous Flights</title>
 </head>
 <body>
-	<%
+	<%out.print("My Previous Flights!");
+	try {
 
-	out.print("History!");	
-	out.print(session.getAttribute("name"));
-    out.print("!");%>
+		//Get the database connection
+		ApplicationDB db = new ApplicationDB();	
+		Connection con = db.getConnection();
+
+		//Create a SQL statement
+		Statement stmt = con.createStatement();
+		
+		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, Available, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='P';", session.getAttribute("name"));
+				
+		ResultSet result = stmt.executeQuery(str);		
+		if(result.next()){
+			
+			result.beforeFirst();
+			//Make an HTML table to show the results in:
+			out.print("<table>");
+
+			//make a row
+			out.print("<tr>");
+			//make a column
+			out.print("<td>");	
+			out.print("Flight_num");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("price");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Take_off_time");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Landing_time");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Num_stops");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Airline");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("type");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Available");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Depart");
+			out.print("</td>");
+            out.print("<td>");	
+			out.print("Arrive");
+			out.print("</td>");
+			out.print("</tr>");
+
+			//parse out the results
+			while (result.next()) {
+				//make a row
+				out.print("<tr>");
+				//make a column
+				out.print("<td>");
+				out.print(result.getString("Flight_num"));
+				out.print("</td>");
+				out.print("<td>");
+				out.print(result.getString("price"));
+				out.print("</td>");
+			    out.print("<td>");	
+				out.print(result.getString("Take_off_time"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("Landing_time"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("Num_stops"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("Airline"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("type"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("Available"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("Depart"));
+				out.print("</td>");
+                out.print("<td>");	
+				out.print(result.getString("Arrive"));
+				out.print("</td>");
+				out.print("</tr>");
+
+			}
+			
+			out.print("</table>");
+			
+			
+		}else{
+			out.print("No Flights Found!");
+		}
+	
+		//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+		con.close();
+		
+		
+	} catch (Exception ex) {
+		out.print(ex);
+	}
+%>
+	
 	<form method="post" action="index.jsp">
 	<button type="submit">return to login page</button>
 	</form>

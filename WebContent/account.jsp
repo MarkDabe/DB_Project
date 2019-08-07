@@ -64,7 +64,7 @@
    {
 		response.sendRedirect("history.jsp");	
    }else if("future".equals(x)){
-	   out.print("future");
+	   response.sendRedirect("future.jsp");
    }else if("waitlist".equals(x)){
 		response.sendRedirect("my_waitlist.jsp");	
 	}else if("logout".equals(x)){

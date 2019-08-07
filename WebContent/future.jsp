@@ -7,12 +7,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>My Wait List</title>
+<title>My Upcoming Flight List</title>
 </head>
 <body>
 	<%
 
-		out.print("My Wait List!");
+		out.print("My Upcoming Flights List!");
 	try {
 
 		//Get the database connection
@@ -22,10 +22,11 @@
 		//Create a SQL statement
 		Statement stmt = con.createStatement();
 		
-		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, Available, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='W';", session.getAttribute("name"));
+		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, Available, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='F';", session.getAttribute("name"));
 				
 		ResultSet result = stmt.executeQuery(str);		
 		if(result.next()){
+			
 			
 			result.beforeFirst();
 			//Make an HTML table to show the results in:
@@ -120,9 +121,86 @@
 		out.print(ex);
 	}
 %>
-	<form method="post" action="index.jsp">
-	<button type="submit">return to login page</button>
-	</form>
+<form method="post">
+<table>
+<td>Flight</td><td><input type="text" name="flight_to_cancel" placeholder="821"></td>
+</table>
+<input type="submit" value="cancel" name ="button" /> 
+</form>	
+
+ <% 
+    String x = request.getParameter("button");
+   if("cancel".equals(x))
+   {
+		try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+			
+			String flight = request.getParameter("flight_to_cancel");
+			
+			String str = String.format("SELECT AirReservationSystem7.Flight.type AS type, Available FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s'AND AirReservationSystem7.CustomInfo.Flight_num = '%2$s' AND AirReservationSystem7.CustomInfo.type='F';", session.getAttribute("name"), flight);
+					
+			ResultSet result = stmt.executeQuery(str);		
+			
+			if(result.next()){
+				
+							
+				if(!result.getString("type").equals("Economy")){
+					
+					String delete = String.format("DELETE FROM CustomInfo WHERE AccountID = '%1$s' AND Flight_num = '%2$s' AND type='F';", session.getAttribute("name"), flight);
+					
+					PreparedStatement ps = con.prepareStatement(delete);
+					
+					ps.executeUpdate(); 
+					
+					delete = String.format("DELETE FROM Ticket WHERE AccountID = '%1$s' AND Flight_num = '%2$s';", session.getAttribute("name"), flight);
+						
+					ps = con.prepareStatement(delete);
+						
+					ps.executeUpdate(); 
+					
+					int temp_available = Integer.parseInt(result.getString("Available").toString());
+					
+					temp_available = temp_available + 1;
+					
+					String update = String.format("UPDATE AirReservationSystem7.Flight SET Available = '%1$s' WHERE Flight_num = '%2$s';", temp_available, flight);
+
+					ps = con.prepareStatement(update);
+
+					//Run the query against the DB
+					ps.executeUpdate(); 
+					
+					
+					out.print("Reservation Cancelled!");	
+					
+				}else{
+					out.print("Cannot Cancel an Economy Reservation!");
+				}
+				
+				
+			}else{
+				out.print("Flight Not Found!");
+			}
+				
+		
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+			
+			
+		} catch (Exception ex) {
+			out.print(ex);
+		}
+		
+   }
+%>
+<form method="post" action="index.jsp">
+<button type="submit">return to login page</button>
+</form>
 
 </body>
 </html>
