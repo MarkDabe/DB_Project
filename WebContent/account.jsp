@@ -148,7 +148,7 @@
 		
 					//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
 					ps.setString(1, type.toLowerCase());
-					ps.setString(2, flight.toLowerCase());
+					ps.setString(2, flights_array[i].toLowerCase());
 					ps.setString(3, session.getAttribute("name").toString().toLowerCase());
 					//Run the query against the DB
 					ps.executeUpdate(); 
