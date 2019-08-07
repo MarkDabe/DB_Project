@@ -7,12 +7,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>My Upcoming Flight List</title>
+<title>My Upcoming Reservations List</title>
 </head>
 <body>
 	<%
 
-		out.print("My Upcoming Flights List!");
+		out.print("My Upcoming Reservations List!");
 	try {
 
 		//Get the database connection
@@ -22,7 +22,7 @@
 		//Create a SQL statement
 		Statement stmt = con.createStatement();
 		
-		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, Available, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='F';", session.getAttribute("name"));
+		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, AirReservationSystem7.CustomInfo.TicketID, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='F';", session.getAttribute("name"));
 				
 		ResultSet result = stmt.executeQuery(str);		
 		if(result.next()){
@@ -57,7 +57,7 @@
 			out.print("type");
 			out.print("</td>");
             out.print("<td>");	
-			out.print("Available");
+			out.print("TicketID");
 			out.print("</td>");
             out.print("<td>");	
 			out.print("Depart");
@@ -94,7 +94,7 @@
 				out.print(result.getString("type"));
 				out.print("</td>");
                 out.print("<td>");	
-				out.print(result.getString("Available"));
+				out.print(result.getString("TicketID"));
 				out.print("</td>");
                 out.print("<td>");	
 				out.print(result.getString("Depart"));
@@ -110,7 +110,7 @@
 			
 			
 		}else{
-			out.print("No Flights Found!");
+			out.print("No Reservations Found!");
 		}
 	
 		//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.

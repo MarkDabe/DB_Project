@@ -17,24 +17,27 @@
 <form method="post">
 <table>
 	<tr>    
-	<td>Flight</td><td><input type="text" name="flight"></td>
+	<td>Airport</td><td><input type="text" name="airport" placeholder="JFK"></td>
 	</tr>
-	<tr>
-	<td>Account</td><td><input type="text" name="account"></td>
+</table>
+       <input type="submit" value="find_flights" name ="button"/> 
+
+</form>	
+
+<form>
+<table>
+	<tr>    
+	<td>Flight</td><td><input type="text" name="flight" placeholder="821"></td>
 	</tr>
 	<tr>    
-	<td>Type</td><td><input type="text" name="type"></td>
+	<td>Customer</td><td><input type="text" name="customer" placeholder="jeeho"></td>
 	</tr>
-	</table>
-       <input type="submit" value="add" name ="button" /> 
-       <input type="submit" value="edit" name ="button" /> 
-       <input type="submit" value="delete" name ="button" /> 
-       <input type="submit" value="logout" name ="button" /> 
-	</form>	
-<br>	
+</table>
+      <input type="submit" value="find_reservations" name ="button"/> 
+</form>
 
-       <% String x = request.getParameter("button");
-   if("add".equals(x)) {
+<% String x = request.getParameter("button");
+   if("find_flights".equals(x)) {
 		try {
 
 			//Get the database connection
@@ -45,27 +48,99 @@
 			Statement stmt = con.createStatement();
 
 			//Get parameters from the HTML form at the HelloWorld.jsp
-			String account = request.getParameter("account");
-			String flight = request.getParameter("flight");
-			String type = request.getParameter("type");
+			String airport = request.getParameter("airport");
 			
-			
-			
-	 		//Make an insert statement for the Sells table:
-			String insert = "INSERT INTO CustomInfo(type, Flight_num, AccountID)"
-					+ "VALUES (?, ?, ?)";
-			//Create a Prepared SQL statement allowing you to introduce the parameters of the query
-			PreparedStatement ps = con.prepareStatement(insert);
 
-			//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
-			ps.setString(1, flight.toLowerCase());
-			ps.setString(2, flight.toLowerCase());
-			ps.setString(3, account.toLowerCase());
-			//Run the query against the DB
-			ps.executeUpdate(); 
+			String str = String.format("SELECT * FROM AirReservationSystem7.Flight WHERE Depart = '%1$s' UNION SELECT * FROM AirReservationSystem7.Flight WHERE Arrive = '%1$s'", airport);
+					
+			ResultSet result = stmt.executeQuery(str);		
+			if(result.next()){
+				
+				result.beforeFirst();
+				//Make an HTML table to show the results in:
+				out.print("<table>");
+
+				//make a row
+				out.print("<tr>");
+				//make a column
+				out.print("<td>");	
+				out.print("Flight_num");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("price");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Take_off_time");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Landing_time");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Num_stops");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Airline");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("type");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Available");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Depart");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Arrive");
+				out.print("</td>");
+				out.print("</tr>");
+
+				//parse out the results
+				while (result.next()) {
+					//make a row
+					out.print("<tr>");
+					//make a column
+					out.print("<td>");
+					out.print(result.getString("Flight_num"));
+					out.print("</td>");
+					out.print("<td>");
+					out.print(result.getString("price"));
+					out.print("</td>");
+				    out.print("<td>");	
+					out.print(result.getString("Take_off_time"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Landing_time"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Num_stops"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Airline"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("type"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Available"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Depart"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Arrive"));
+					out.print("</td>");
+					out.print("</tr>");
+
+				}
+				
+				out.print("</table>");
+				
+				
+			}else{
+				out.print("No Flights Found!");
+			}
 			
-			
-			out.print("Reservation Added!");
 			
 			
 			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
@@ -76,8 +151,146 @@
 			
 			out.print("Flight/Account Not Found!");
 		}
-   }else if("edit".equals(x)){
-	   out.print("future");
+   }else if("find_reservations".equals(x)){
+	   
+		try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+			
+			String str = "SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, AirReservationSystem7.CustomInfo.TicketID, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num" ;
+			
+			String customer = request.getParameter("customer");
+			String flight = request.getParameter("flight");
+			
+			
+			if(customer != null && !"".equals(customer)){
+				if(str.contains("WHERE")){
+					
+					str = str + " AND " + String.format("AirReservationSystem7.CustomInfo.AccountID='%1$s'", customer);
+		
+				}else{
+					str = str + " WHERE " + String.format("AirReservationSystem7.CustomInfo.AccountID='%1$s'", customer);
+
+				}
+			}
+			
+			
+			if(flight != null && !"".equals(flight)){
+				
+				if(str.contains("WHERE")){
+					
+					str = str + " AND " + String.format("AirReservationSystem7.CustomInfo.Flight_num='%1$s'", flight);
+		
+				}else{
+					str = str + " WHERE " + String.format("AirReservationSystem7.CustomInfo.Flight_num='%1$s'", flight);
+
+				}
+				
+			}
+			
+			
+			ResultSet result = stmt.executeQuery(str);		
+			if(result.next()){
+				
+				
+				result.beforeFirst();
+				//Make an HTML table to show the results in:
+				out.print("<table>");
+
+				//make a row
+				out.print("<tr>");
+				//make a column
+				out.print("<td>");	
+				out.print("Flight_num");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("price");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Take_off_time");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Landing_time");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Num_stops");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Airline");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("type");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("TicketID");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Depart");
+				out.print("</td>");
+	            out.print("<td>");	
+				out.print("Arrive");
+				out.print("</td>");
+				out.print("</tr>");
+
+				//parse out the results
+				while (result.next()) {
+					//make a row
+					out.print("<tr>");
+					//make a column
+					out.print("<td>");
+					out.print(result.getString("Flight_num"));
+					out.print("</td>");
+					out.print("<td>");
+					out.print(result.getString("price"));
+					out.print("</td>");
+				    out.print("<td>");	
+					out.print(result.getString("Take_off_time"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Landing_time"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Num_stops"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Airline"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("type"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("TicketID"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Depart"));
+					out.print("</td>");
+	                out.print("<td>");	
+					out.print(result.getString("Arrive"));
+					out.print("</td>");
+					out.print("</tr>");
+
+				}
+				
+				out.print("</table>");
+				
+				
+			}else{
+				out.print("No Reservations Found!");
+			}
+		
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+			
+			
+		} catch (Exception ex) {
+			out.print(ex);
+		}
+
    }else if("delete".equals(x)){
 		response.sendRedirect("my_waitlist.jsp");	
 	}else if("logout".equals(x)){

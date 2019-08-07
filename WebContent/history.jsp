@@ -10,7 +10,7 @@
 <title>MY Previous Flights</title>
 </head>
 <body>
-	<%out.print("My Previous Flights!");
+	<%out.print("My Previous Reservations!");
 	try {
 
 		//Get the database connection
@@ -20,7 +20,7 @@
 		//Create a SQL statement
 		Statement stmt = con.createStatement();
 		
-		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, Available, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='P';", session.getAttribute("name"));
+		String str = String.format("SELECT AirReservationSystem7.Flight.Flight_num AS Flight_num, price, Take_off_time, Landing_time, Num_stops, Airline, AirReservationSystem7.Flight.type AS type, AirReservationSystem7.CustomInfo.TicketID, Depart, Arrive FROM AirReservationSystem7.CustomInfo inner join AirReservationSystem7.Flight on AirReservationSystem7.CustomInfo.Flight_num=AirReservationSystem7.Flight.Flight_num WHERE AirReservationSystem7.CustomInfo.AccountID='%1$s' AND AirReservationSystem7.CustomInfo.type='P';", session.getAttribute("name"));
 				
 		ResultSet result = stmt.executeQuery(str);		
 		if(result.next()){
@@ -54,7 +54,7 @@
 			out.print("type");
 			out.print("</td>");
             out.print("<td>");	
-			out.print("Available");
+			out.print("TicketID");
 			out.print("</td>");
             out.print("<td>");	
 			out.print("Depart");
@@ -91,7 +91,7 @@
 				out.print(result.getString("type"));
 				out.print("</td>");
                 out.print("<td>");	
-				out.print(result.getString("Available"));
+				out.print(result.getString("TicketID"));
 				out.print("</td>");
                 out.print("<td>");	
 				out.print(result.getString("Depart"));

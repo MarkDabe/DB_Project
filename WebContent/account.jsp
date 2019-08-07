@@ -110,20 +110,8 @@
 
 						//Run the query against the DB
 						ps.executeUpdate(); 
-						
-						String insert = "INSERT INTO CustomInfo(type, Flight_num, AccountID)"
-								+ "VALUES (?, ?, ?)";
-						//Create a Prepared SQL statement allowing you to introduce the parameters of the query
-						 ps = con.prepareStatement(insert);
-			
-						//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
-						ps.setString(1, type.toLowerCase());
-						ps.setString(2, flights_array[i].toLowerCase());
-					    ps.setString(3, session.getAttribute("name").toString().toLowerCase());
-						//Run the query against the DB
-					    ps.executeUpdate(); 
-						
-					    insert = "INSERT INTO Ticket(TicketID, Flight_num, AccountID, Fare)"
+							
+					    String insert = "INSERT INTO Ticket(TicketID, Flight_num, AccountID, Fare)"
 								+ "VALUES (?, ?, ?, ?)";
 						//Create a Prepared SQL statement allowing you to introduce the parameters of the query
 						ps = con.prepareStatement(insert);
@@ -133,6 +121,21 @@
 						ps.setString(2, flights_array[i].toLowerCase());
 					    ps.setString(3, session.getAttribute("name").toString().toLowerCase());
 					    ps.setString(4, result.getString("price").toString());
+						//Run the query against the DB
+					    ps.executeUpdate(); 
+						
+						
+						 insert = "INSERT INTO CustomInfo(type, Flight_num, AccountID, TicketID)"
+								+ "VALUES (?, ?, ?, ?)";
+						//Create a Prepared SQL statement allowing you to introduce the parameters of the query
+						 ps = con.prepareStatement(insert);
+			
+						//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
+						ps.setString(1, type.toLowerCase());
+						ps.setString(2, flights_array[i].toLowerCase());
+					    ps.setString(3, session.getAttribute("name").toString().toLowerCase());
+					    ps.setString(4, session.getAttribute("name").toString().toLowerCase() + timestamp);
+					    
 						//Run the query against the DB
 					    ps.executeUpdate(); 
 			
