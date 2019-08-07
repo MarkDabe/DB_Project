@@ -24,21 +24,7 @@
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		
-		
-		
-
-/* 		//Make an insert statement for the Sells table:
-		String insert = "INSERT INTO sells(bar, beer)"
-				+ "VALUES (?, ?)";
-		//Create a Prepared SQL statement allowing you to introduce the parameters of the query
-		PreparedStatement ps = con.prepareStatement(insert);
-
-		//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
-		ps.setString(1, newBar);
-		ps.setString(2, newBeer);
-		//Run the query against the DB
-		ps.executeUpdate(); */
-		
+	
 
 
 		String str = String.format("SELECT * FROM Account WHERE (AccountID = '%1$s') AND (Accountcol = '%2$s');", username, password);

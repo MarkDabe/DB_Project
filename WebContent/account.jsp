@@ -45,12 +45,18 @@
        <td>sort by arrival</td><td><input type="checkbox" name="sort_by_arrival" value="sort_by_arrival"></td>
        </table>  
 	</form>	
+		<form  method='post'>
+	   <td>flights to reserve</td><td><input type="text" name="flights_to_reserve" placeholder="821,123,.."></td>
+       <input type="submit" value="reserve" name ="button" /> 
+       </form>
        <form  method='post'>
        <input type="submit" value="history" name ="button" /> 
        <input type="submit" value="waitlist" name ="button" /> 
        <input type="submit" value="future" name ="button" /> 
        <input type="submit" value="logout" name ="button" /> 
        </form>
+
+       
 
   <% 
     String x = request.getParameter("button");
@@ -64,6 +70,115 @@
 	}else if("logout".equals(x)){
 		session.setAttribute("name", null);
 		response.sendRedirect("index.jsp");	
+	}else if("reserve".equals(x)){
+		try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+
+
+			String flight = request.getParameter("flights_to_reserve");
+							
+			String[] flights_array = flight.split(",");
+			
+			int i = 0;
+			
+			String timestamp = System.currentTimeMillis() / 1000L + "";
+			
+			while(i < flights_array.length){
+			
+			String type = null;
+			
+			String query = String.format("SELECT * FROM AirReservationSystem7.Flight WHERE Flight_num = '%1$s'", flights_array[i]);
+
+			ResultSet result = stmt.executeQuery(query);	
+			
+			if(result.next()){
+				
+				if(!result.getString("Available").toString().equals("0")){
+						type = "F";
+						
+						int temp_available = Integer.parseInt(result.getString("Available").toString());
+						temp_available = temp_available - 1;
+						String update = String.format("UPDATE AirReservationSystem7.Flight SET Available = '%1$s' WHERE Flight_num = '%2$s'", temp_available, flights_array[i]);
+
+						PreparedStatement ps = con.prepareStatement(update);
+
+						//Run the query against the DB
+						ps.executeUpdate(); 
+						
+						String insert = "INSERT INTO CustomInfo(type, Flight_num, AccountID)"
+								+ "VALUES (?, ?, ?)";
+						//Create a Prepared SQL statement allowing you to introduce the parameters of the query
+						 ps = con.prepareStatement(insert);
+			
+						//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
+						ps.setString(1, type.toLowerCase());
+						ps.setString(2, flights_array[i].toLowerCase());
+					    ps.setString(3, session.getAttribute("name").toString().toLowerCase());
+						//Run the query against the DB
+					    ps.executeUpdate(); 
+						
+					    insert = "INSERT INTO Ticket(TicketID, Flight_num, AccountID, Fare)"
+								+ "VALUES (?, ?, ?, ?)";
+						//Create a Prepared SQL statement allowing you to introduce the parameters of the query
+						ps = con.prepareStatement(insert);
+
+						//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
+						ps.setString(1, session.getAttribute("name").toString().toLowerCase() + timestamp);
+						ps.setString(2, flights_array[i].toLowerCase());
+					    ps.setString(3, session.getAttribute("name").toString().toLowerCase());
+					    ps.setString(4, result.getString("price").toString());
+						//Run the query against the DB
+					    ps.executeUpdate(); 
+			
+					   	out.print("Reservation added for flight " + flights_array[i] + " ");
+
+				}else{
+					type = "W";
+			 		//Make an insert statement for the Sells table:
+					String insert = "INSERT INTO CustomInfo(type, Flight_num, AccountID)"
+							+ "VALUES (?, ?, ?)";
+					//Create a Prepared SQL statement allowing you to introduce the parameters of the query
+					PreparedStatement ps = con.prepareStatement(insert);
+		
+					//Add parameters of the query. Start with 1, the 0-parameter is the INSERT statement itself
+					ps.setString(1, type.toLowerCase());
+					ps.setString(2, flight.toLowerCase());
+					ps.setString(3, session.getAttribute("name").toString().toLowerCase());
+					//Run the query against the DB
+					ps.executeUpdate(); 
+
+					out.print("Waitlisted for flight " + flights_array[i] + " ");
+				}
+
+			
+			
+			}else{
+
+				out.print("Flight " + flights_array[i] + " Not Found!");
+				
+			}
+						
+			 i++;			
+			}
+			
+			
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+
+			
+		} catch (Exception ex) {
+			
+			out.print(ex);
+			
+			out.print("Flight/Account Not Found!");
+		}
+	
 	}else if("find_oneway".equals(x)){
 		try {
 
@@ -361,7 +476,7 @@
 			
 		if(flexible == null){	
 			
-			str = String.format("(SELECT * FROM AirReservationSystem7.Flight WHERE (Depart = '%1$s' AND Arrive = '%2$s' AND  Take_off_time = '%3$s') UNION SELECT * FROM AirReservationSystem7.Flight WHERE (Depart = '%2$s' AND Arrive = '%1$s' AND Landing_time = '%4$s'))",
+			str = String.format("SELECT * FROM AirReservationSystem7.Flight WHERE (Depart = '%1$s' AND Arrive = '%2$s' AND  Take_off_time = '%3$s') UNION SELECT * FROM AirReservationSystem7.Flight WHERE (Depart = '%2$s' AND Arrive = '%1$s' AND Landing_time = '%4$s')",
 					from, to, takeoff, landing);
 							
 		
@@ -486,8 +601,6 @@
 				
 			}
 			
-			//out.print(str);
-			//out.print(str);
 			//out.print(str);
 
 			ResultSet result = stmt.executeQuery(str);		
