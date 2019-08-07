@@ -487,6 +487,8 @@
 			}
 			
 			//out.print(str);
+			//out.print(str);
+			//out.print(str);
 
 			ResultSet result = stmt.executeQuery(str);		
 		
