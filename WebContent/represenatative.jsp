@@ -150,9 +150,10 @@
 				ResultSet result = stmt.executeQuery(str);		
 				
 				if(result.next()){
+					result.beforeFirst();
 					//Make an HTML table to show the results in:
 					out.print("<table>");
-
+					
 					//make a row
 					out.print("<tr>");
 					//make a column
@@ -163,7 +164,6 @@
 					out.print("</td>");
 					//make a column
 					out.print("<td>");
-					//depending on the radio button selection make a column header for Manufacturer if the beers table was selected and Address if the bars table was selected
 
 
 					out.print("</td>");
@@ -196,7 +196,6 @@
 			
 		} catch (Exception ex) {
 			
-			out.print(ex);
 			
 			out.print("Flight Not Found!");
 		}
