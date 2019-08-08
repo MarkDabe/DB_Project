@@ -12,7 +12,12 @@
 </head>
 <body>
 <%	out.print("Admin Account"); %>
-       
+<br> 
+
+<form method="post">
+       <input type="submit" value="find_most_paying_customer" name ="button"/> 
+       <input type="submit" value="find_most_active_flights" name ="button"/> 
+</form>      
 
 <form method="post">
 <table>
@@ -378,6 +383,91 @@ String x = request.getParameter("button");
 			out.print(ex);
 		}
 	  
+	}else if("find_most_paying_customer".equals(x)){
+		
+		try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+			
+			String str = "SELECT AccountID, revenue FROM (SELECT AccountID, SUM(fare) as revenue FROM AirReservationSystem7.Ticket GROUP BY AccountID) AS T WHERE T.revenue = (SELECT MAX(revenue) FROM (SELECT AccountID, SUM(fare) as revenue FROM AirReservationSystem7.Ticket GROUP BY AccountID) AS T2) LIMIT 1";
+
+			ResultSet result = stmt.executeQuery(str);		
+			
+			if(result.next()){
+				out.print("Revenue: ");
+				out.print(result.getString("revenue"));
+				out.print(" Account: ");
+				out.print(result.getString("AccountID"));
+
+			}else{
+				out.print("Highest Paying Customer Not Found!");
+			}
+
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+			
+		} catch (Exception ex) {
+			out.print(ex);
+		}
+   
+	}else if("find_most_active_flights".equals(x)){
+		
+		try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+			
+			String str = "SELECT Flight_num FROM (SELECT Flight_num, Count(TicketID) as Tickets FROM AirReservationSystem7.Ticket GROUP BY Flight_num) AS T WHERE T.Tickets = (SELECT MAX(Tickets) FROM (SELECT Flight_num, Count(TicketID) as Tickets FROM AirReservationSystem7.Ticket GROUP BY Flight_num) AS T2)";
+
+			ResultSet result = stmt.executeQuery(str);		
+			
+			if(result.next()){
+				
+				result.beforeFirst();
+				//Make an HTML table to show the results in:
+				out.print("<table>");
+
+				//make a row
+				out.print("<tr>");
+				out.print("<td>");	
+				out.print("Most Active Flights");
+				out.print("</td>");
+				out.print("</tr>");
+
+				//parse out the results
+				while (result.next()) {
+					out.print("<tr>");
+					out.print("<td>");
+					out.print(result.getString("Flight_num"));
+					out.print("</td>");
+					out.print("</tr>");
+
+				}
+				
+				out.print("</table>");
+
+
+			}else{
+				out.print("Most Active Earning Flights Not Found!");
+			}
+
+	
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+			
+		} catch (Exception ex) {
+			out.print(ex);
+		}
+   
 	}else if("logout".equals(x)){
 		session.setAttribute("name", null);
 		response.sendRedirect("index.jsp");	
