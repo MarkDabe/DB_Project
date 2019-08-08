@@ -13,7 +13,7 @@
 <body>
 <%	out.print("Admin Account"); %>
        
-<br>
+
 <form method="post">
 <table>
 	<tr>    
@@ -24,7 +24,22 @@
 
 </form>	
 
-<form>
+<form method="post">
+<table>
+	<tr>    
+	<td>Flight</td><td><input type="text" name="flight_revenue" placeholder="821"></td>
+	</tr>
+	<tr>    
+	<td>Customer</td><td><input type="text" name="customer_revenue" placeholder="jeeho"></td>
+	</tr>
+	<tr>    
+	<td>Airport</td><td><input type="text" name="airport_revenue" placeholder="JFK"></td>
+	</tr>
+</table>
+      <input type="submit" value="find_revenue" name ="button"/> 
+</form>
+
+<form method="post">
 <table>
 	<tr>    
 	<td>Flight</td><td><input type="text" name="flight" placeholder="821"></td>
@@ -35,8 +50,8 @@
 </table>
       <input type="submit" value="find_reservations" name ="button"/> 
 </form>
-
-<% String x = request.getParameter("button");
+<% 
+String x = request.getParameter("button");
    if("find_flights".equals(x)) {
 		try {
 
@@ -193,7 +208,6 @@
 				
 			}
 			
-			
 			ResultSet result = stmt.executeQuery(str);		
 			if(result.next()){
 				
@@ -291,8 +305,79 @@
 			out.print(ex);
 		}
 
-   }else if("delete".equals(x)){
-		response.sendRedirect("my_waitlist.jsp");	
+   }else if("find_revenue".equals(x)){
+	   
+	   
+		try {
+
+			//Get the database connection
+			ApplicationDB db = new ApplicationDB();	
+			Connection con = db.getConnection();
+
+			//Create a SQL statement
+			Statement stmt = con.createStatement();
+			
+			String str = "SELECT SUM(fare) AS revenue FROM AirReservationSystem7.Ticket inner join AirReservationSystem7.Flight on AirReservationSystem7.Ticket.Flight_num=AirReservationSystem7.Flight.Flight_num" ;
+			;
+			String airport = request.getParameter("airport_revenue");
+			String customer = request.getParameter("customer_revenue");
+			String flight = request.getParameter("flight_revenue");
+			
+			
+			if(customer != null && !"".equals(customer)){
+				if(str.contains("WHERE")){
+					
+					str = str + " AND " + String.format(" AirReservationSystem7.Ticket.AccountID='%1$s'", customer);
+		
+				}else{
+					str = str + " WHERE " + String.format(" AirReservationSystem7.Ticket.AccountID='%1$s'", customer);
+
+				}
+			}
+			
+			if(flight != null && !"".equals(flight)){
+				if(str.contains("WHERE")){
+					
+					str = str + " AND " + String.format(" AirReservationSystem7.Ticket.Flight_num='%1$s'", flight);
+		
+				}else{
+					str = str + " WHERE " + String.format(" AirReservationSystem7.Ticket.Flight_num='%1$s'", flight);
+
+				}
+			}
+			if(airport != null && !"".equals(airport)){
+				
+				if(str.contains("WHERE")){
+					
+					str = str + " AND " + String.format(" (AirReservationSystem7.Flight.Arrive='%1$s'OR AirReservationSystem7.Flight.Depart='%1$s')", airport);
+		
+				}else{
+					str = str + " WHERE " + String.format(" (AirReservationSystem7.Flight.Arrive='%1$s'OR AirReservationSystem7.Flight.Depart='%1$s')", airport);
+
+				}
+				
+			}
+			
+			
+			
+			ResultSet result = stmt.executeQuery(str);		
+			
+			if(result.next()){
+				out.print("Revenue: ");
+				out.print(result.getString("revenue"));
+
+			}else{
+				out.print("Revenue Not Found!");
+			}
+
+	
+			//Close the connection. Don't forget to do it, otherwise you're keeping the resources of the server allocated.
+			con.close();
+			
+		} catch (Exception ex) {
+			out.print(ex);
+		}
+	  
 	}else if("logout".equals(x)){
 		session.setAttribute("name", null);
 		response.sendRedirect("index.jsp");	
